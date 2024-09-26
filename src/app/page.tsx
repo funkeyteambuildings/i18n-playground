@@ -1,12 +1,19 @@
+/* eslint-disable */
+
+import { headers } from "next/headers";
 import Link from "next/link";
 
 import { LatestPost } from "~/app/_components/post";
+import { I18N_CONF } from "~/features/i18n";
 import { api, HydrateClient } from "~/trpc/server";
 
-export default async function Home() {
+export default async function Home(_props: {}) {
   const hello = await api.post.hello({ text: "from tRPC" });
 
   void api.post.getLatest.prefetch();
+
+  const reqHeaders = Object.fromEntries(headers().entries());
+  console.debug(reqHeaders);
 
   return (
     <HydrateClient>
@@ -46,6 +53,14 @@ export default async function Home() {
           </div>
 
           <LatestPost />
+        </div>
+
+        <div className="my-5 flex flex-col gap-1">
+          {I18N_CONF.LOCALES.map((x) => (
+            <Link key={x} href={"/"} hrefLang={x} locale={x}>
+              Navigate to locale "{x}"
+            </Link>
+          ))}
         </div>
       </main>
     </HydrateClient>
